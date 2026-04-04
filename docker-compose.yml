@@ -1,0 +1,27 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: ordermanagement-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Your_password123"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+
+  web:
+    build:
+      context: .
+      dockerfile: src/Web/Dockerfile
+    container_name: ordermanagement-web
+    depends_on:
+      - sqlserver
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__OrderManagementDb: Server=sqlserver,1433;Database=OrderManagementDb;User Id=sa;Password=Your_password123;TrustServerCertificate=True;Encrypt=False
+    ports:
+      - "8080:8080"
+
+volumes:
+  sqlserver-data:
