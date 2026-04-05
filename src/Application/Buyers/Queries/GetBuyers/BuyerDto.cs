@@ -10,11 +10,14 @@ public class BuyerDto
 
     public string Name { get; init; } = default!;
 
+    public List<Order> Orders { get; private set; } = [];
+
     private class Mapping : Profile
     {
         public Mapping()
         {
-            CreateMap<Buyer, BuyerDto>();
+            CreateMap<Buyer, BuyerDto>()
+                .ForMember(dest => dest.Orders, opt => opt.MapFrom(src => src.Orders));
         }
     }
 }

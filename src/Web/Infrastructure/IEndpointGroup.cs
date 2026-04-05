@@ -9,9 +9,11 @@ public interface IEndpointGroup
 {
     /// <summary>
     /// Route prefix used when mapping the endpoint group.
-    /// When omitted, the default prefix is <c>/api/{ClassName}</c>.
+    /// When omitted, the default prefix is <c>/api/v{version:apiVersion}/{ClassName}</c>.
     /// </summary>
     static virtual string? RoutePrefix => null;
-
+    
+    static virtual int Version => 1;
+    
     static abstract void Map(RouteGroupBuilder groupBuilder);
 }

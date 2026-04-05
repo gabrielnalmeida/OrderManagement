@@ -11,5 +11,10 @@ public class BuyerConfiguration : IEntityTypeConfiguration<Buyer>
         builder.Property(b => b.Name)
             .IsRequired()
             .HasMaxLength(100);
+
+        builder.HasMany(b => b.Orders)
+            .WithOne(o => o.Buyer)
+            .HasForeignKey(o => o.BuyerId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -29,6 +29,9 @@ public static class DependencyInjection
 
         builder.Services.AddScoped<ApplicationDbContextInitialiser>();
 
+        builder.Services.AddMemoryCache();
+        builder.Services.AddSingleton<IApplicationCache, ApplicationMemoryCache>();
+        
         builder.Services.AddSingleton(TimeProvider.System);
     }
 }

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OrderManagement.Domain.Entities;
@@ -33,8 +34,7 @@ public class ApplicationDbContextInitialiser
     {
         try
         {
-            await _context.Database.EnsureDeletedAsync();
-            await _context.Database.EnsureCreatedAsync();
+            await _context.Database.MigrateAsync();
         }
         catch (Exception ex)
         {
@@ -81,6 +81,19 @@ public class ApplicationDbContextInitialiser
 
             await _context.SaveChangesAsync();
         }
-    }
 
+        if (!_context.Orders.Any())
+        {
+            var buyer = _context.Buyers.First();
+            var product = _context.Products.First();
+
+            var order = new Order(buyer.Id,
+            [
+                new(product.Id, 2, product.Price)
+            ]);
+            
+            _context.Orders.Add(order);
+            await _context.SaveChangesAsync();
+        }
+    }    
 }

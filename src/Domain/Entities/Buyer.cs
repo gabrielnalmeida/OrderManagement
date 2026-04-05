@@ -6,6 +6,8 @@ public class Buyer : BaseAuditableEntity
 
     private Buyer() { }
 
+    public List<Order> Orders { get; private set; } = [];
+
     public Buyer(string name)
     {
         Name = name;

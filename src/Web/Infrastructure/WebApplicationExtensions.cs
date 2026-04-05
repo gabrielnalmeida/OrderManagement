@@ -1,4 +1,5 @@
 using System.Reflection;
+using Asp.Versioning;
 
 namespace OrderManagement.Web.Infrastructure;
 
@@ -17,9 +18,21 @@ public static class WebApplicationExtensions
         foreach (var type in endpointGroupTypes)
         {
             var groupName = type.Name;
+            var version = (int?)type.GetProperty(nameof(IEndpointGroup.Version))?.GetValue(null) ?? 1;
+
             var routePrefix = type.GetProperty(nameof(IEndpointGroup.RoutePrefix))
-                ?.GetValue(null) as string ?? $"/api/{groupName}";
-            var group = app.MapGroup(routePrefix).WithTags(groupName);
+                ?.GetValue(null) as string ?? $"/api/v{{version:apiVersion}}/{groupName}";
+
+            var versionSet = app.NewApiVersionSet()
+                .HasApiVersion(new ApiVersion(version, 0))
+                .ReportApiVersions()
+                .Build();
+
+            var group = app.MapGroup(routePrefix)
+                .WithTags(groupName)
+                .WithApiVersionSet(versionSet)
+                .MapToApiVersion(new ApiVersion(version, 0));
+                
             type.GetMethod(nameof(IEndpointGroup.Map))!.Invoke(null, [group]);
         }
 
