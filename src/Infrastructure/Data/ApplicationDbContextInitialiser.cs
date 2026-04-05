@@ -70,6 +70,17 @@ public class ApplicationDbContextInitialiser
 
             await _context.SaveChangesAsync();
         }
+
+        if (!_context.Buyers.Any())
+        {
+            _context.Buyers.AddRange(
+                new Buyer("Buyer 1"),
+                new Buyer("Buyer 2"),
+                new Buyer("Buyer 3")
+            );
+
+            await _context.SaveChangesAsync();
+        }
     }
 
 }

@@ -11,6 +11,8 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
 
     public DbSet<Product> Products => Set<Product>();
 
+    public DbSet<Buyer> Buyers => Set<Buyer>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
