@@ -1,4 +1,5 @@
 using OrderManagement.Application.Common.Caching;
+using OrderManagement.Application.Orders.Commands.DeleteOrder;
 using OrderManagement.Application.UnitTests.Common;
 
 namespace OrderManagement.Application.UnitTests.Handlers;
@@ -198,6 +199,56 @@ public class UpdateOrderCommandHandlerTests
     }
 
     private static void SeedStartedOrder(ApplicationDbContext db)
+    {
+        var buyer = new Buyer("Buyer");
+        var product = new Product("Product", null, 10m);
+        db.Buyers.Add(buyer);
+        db.Products.Add(product);
+        db.SaveChanges();
+        db.Orders.Add(new Order(buyer.Id, [new OrderItem(product.Id, 1, product.Price)]));
+    }
+}
+
+public class DeleteOrderCommandHandlerTests
+{
+    [Test]
+    public async Task ShouldThrowNotFoundWhenOrderDoesNotExist()
+    {
+        await using var context = await TestDbContextFactory.CreateContextAsync();
+        var cache = new Mock<IApplicationCache>();
+        var handler = new DeleteOrderCommandHandler(context, cache.Object);
+
+        var action = async () => await handler.Handle(new DeleteOrderCommand(999), CancellationToken.None);
+
+        await action.ShouldThrowAsync<NotFoundException>();
+    }
+
+    [Test]
+    public async Task ShouldRemoveOrderAndInvalidateOrdersListCacheWhenOrderExists()
+    {
+        await using var context = await TestDbContextFactory.CreateContextAsync(seed: SeedOrder);
+        var cache = new Mock<IApplicationCache>();
+        var handler = new DeleteOrderCommandHandler(context, cache.Object);
+
+        await handler.Handle(new DeleteOrderCommand(context.Orders.Single().Id), CancellationToken.None);
+
+        context.Orders.ShouldBeEmpty();
+        cache.Verify(x => x.RemoveByPrefixAsync(CachingKeys.OrdersListPrefix, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Test]
+    public async Task ShouldSaveChangesWhenOrderIsDeleted()
+    {
+        await using var context = await TestDbContextFactory.CreateContextAsync(seed: SeedOrder);
+        var cache = new Mock<IApplicationCache>();
+        var handler = new DeleteOrderCommandHandler(context, cache.Object);
+
+        await handler.Handle(new DeleteOrderCommand(context.Orders.Single().Id), CancellationToken.None);
+
+        (await context.Orders.CountAsync()).ShouldBe(0);
+    }
+
+    private static void SeedOrder(ApplicationDbContext db)
     {
         var buyer = new Buyer("Buyer");
         var product = new Product("Product", null, 10m);
