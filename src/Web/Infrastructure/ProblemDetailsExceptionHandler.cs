@@ -14,16 +14,17 @@ public class ProblemDetailsExceptionHandler : IExceptionHandler
     {
         var (statusCode, problemDetails) = exception switch
         {
-            ValidationException ve => (StatusCodes.Status400BadRequest, (ProblemDetails)new ValidationProblemDetails(ve.Errors)
+            ValidationException ve => (StatusCodes.Status400BadRequest, new ValidationProblemDetails(ve.Errors)
             {
                 Status = StatusCodes.Status400BadRequest,
                 Type = "https://tools.ietf.org/html/rfc9110#section-15.5.1"
             }),
-            UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, new ProblemDetails
+            NotFoundException nfe => (StatusCodes.Status404NotFound, new ProblemDetails
             {
-                Status = StatusCodes.Status401Unauthorized,
-                Title = "Unauthorized",
-                Type = "https://tools.ietf.org/html/rfc9110#section-15.5.2"
+                Status = StatusCodes.Status404NotFound,
+                Title = "Resource Not Found",
+                Detail = nfe.Message,
+                Type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
             }),
             _ => (-1, null)
         };
