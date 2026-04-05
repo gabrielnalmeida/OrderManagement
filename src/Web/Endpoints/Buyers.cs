@@ -26,11 +26,13 @@ public class Buyers : IEndpointGroup
 
     [EndpointSummary("Criar um novo comprador")]
     [EndpointDescription("Cria um novo comprador com as informações fornecidas no payload.")]
-    public static async Task<Created<int>> CreateBuyer(ISender sender, CreateBuyerCommand command)
+    public static async Task<Created<int>> CreateBuyer(ISender sender, HttpContext httpContext, CreateBuyerCommand command)
     {
         var id = await sender.Send(command);
 
-        return TypedResults.Created($"/api/{nameof(Buyers)}/{id}", id);
+        var location = $"{httpContext.Request.Path}/{id}";
+
+        return TypedResults.Created(location, id);
     }
 
     [EndpointSummary("Atualizar um comprador")]

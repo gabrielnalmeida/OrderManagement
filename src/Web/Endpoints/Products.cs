@@ -36,11 +36,13 @@ public class Products : IEndpointGroup
 
     [EndpointSummary("Criar um novo produto")]
     [EndpointDescription("Cria um novo produto com as informações fornecidas no payload.")]
-    public static async Task<Created<int>> CreateProduct(ISender sender, CreateProductCommand command)
+    public static async Task<Created<int>> CreateProduct(ISender sender, HttpContext httpContext, CreateProductCommand command)
     {
         var id = await sender.Send(command);
 
-        return TypedResults.Created($"/api/{nameof(Products)}/{id}", id);
+        var location = $"{httpContext.Request.Path}/{id}";
+
+        return TypedResults.Created(location, id);
     }
 
     [EndpointSummary("Atualizar um produto")]

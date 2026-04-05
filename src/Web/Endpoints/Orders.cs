@@ -3,6 +3,7 @@ using OrderManagement.Application.Orders.Commands.UpdateOrder;
 using OrderManagement.Application.Orders.Commands.ProcessOrder;
 using OrderManagement.Application.Orders.Commands.ShipOrder;
 using OrderManagement.Application.Orders.Commands.CancelOrder;
+using OrderManagement.Application.Orders.Commands.DeleteOrder;
 using OrderManagement.Application.Orders.Queries.GetOrders;
 using OrderManagement.Application.Orders.Queries.GetOrderById;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -20,7 +21,8 @@ public class Orders : IEndpointGroup
         groupBuilder.MapPut(UpdateOrder, "{id:int}");
         groupBuilder.MapPut(ProcessOrder, "{id:int}/process");
         groupBuilder.MapPut(ShipOrder, "{id:int}/ship");
-        groupBuilder.MapDelete(CancelOrder, "{id:int}/cancel");
+        groupBuilder.MapPut(CancelOrder, "{id:int}/cancel");
+        groupBuilder.MapDelete(DeleteOrder, "{id:int}");
     }
 
     [EndpointSummary("Obter todos os pedidos")]
@@ -51,11 +53,13 @@ public class Orders : IEndpointGroup
 
     [EndpointSummary("Criar um novo pedido")]
     [EndpointDescription("Cria um novo pedido com as informações fornecidas no payload.")]
-    public static async Task<Created<int>> CreateOrder(ISender sender, CreateOrderCommand command)
+    public static async Task<Created<int>> CreateOrder(ISender sender,HttpContext httpContext, CreateOrderCommand command)
     {
         var id = await sender.Send(command);
 
-        return TypedResults.Created($"/api/{nameof(Orders)}/{id}", id);
+        var location = $"{httpContext.Request.Path}/{id}";
+
+        return TypedResults.Created(location, id);
     }
 
     [EndpointSummary("Atualizar um pedido")]
@@ -91,6 +95,14 @@ public class Orders : IEndpointGroup
     {
         await sender.Send(new CancelOrderCommand(id));
         return TypedResults.NoContent();    
+    }
+
+    [EndpointSummary("Excluir um pedido")]
+    [EndpointDescription("Exclui o pedido especificado do sistema.")]
+    public static async Task<NoContent> DeleteOrder(ISender sender, int id)
+    {
+        await sender.Send(new DeleteOrderCommand(id));
+        return TypedResults.NoContent();
     }
 }
 
