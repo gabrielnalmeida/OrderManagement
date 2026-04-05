@@ -3,6 +3,7 @@ using OrderManagement.Application.Common.Caching;
 using OrderManagement.Application.Common.Interfaces;
 using OrderManagement.Application.OrderItems.Models;
 using OrderManagement.Domain.Entities;
+using ValidationException = OrderManagement.Application.Common.Exceptions.ValidationException;
 
 namespace OrderManagement.Application.Orders.Commands.CreateOrder;
 
@@ -26,9 +27,12 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, int
 
     public async Task<int> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
-        var buyer = await _context.Buyers.AnyAsync(x => x.Id == request.BuyerId, cancellationToken);
+        var buyerExists = await _context.Buyers.AnyAsync(x => x.Id == request.BuyerId, cancellationToken);
 
-        Guard.Against.NotFound(request.BuyerId, buyer);
+        if (!buyerExists)
+        {
+            throw new NotFoundException(nameof(Buyer), request.BuyerId.ToString());
+        }
 
         var reqProductIds = request.Items
             .Select(x => x.ProductId)

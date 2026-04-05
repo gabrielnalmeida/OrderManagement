@@ -2,6 +2,7 @@ using FluentValidation.Results;
 using OrderManagement.Application.Common.Caching;
 using OrderManagement.Application.Common.Interfaces;
 using OrderManagement.Application.OrderItems.Models;
+using ValidationException = OrderManagement.Application.Common.Exceptions.ValidationException;
 
 namespace OrderManagement.Application.Orders.Commands.UpdateOrder;
 
