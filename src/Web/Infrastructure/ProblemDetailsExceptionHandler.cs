@@ -17,7 +17,10 @@ public class ProblemDetailsExceptionHandler : IExceptionHandler
             ValidationException ve => (StatusCodes.Status400BadRequest, new ValidationProblemDetails(ve.Errors)
             {
                 Status = StatusCodes.Status400BadRequest,
-                Type = "https://tools.ietf.org/html/rfc9110#section-15.5.1"
+                Title = "Validation Failed",
+                Detail = ve.Errors.SelectMany(x => x.Value).FirstOrDefault()
+                    ?? exception.Message,
+                Type = "https://tools.ietf.org/html/rfc9110#section-15.5.1",
             }),
             NotFoundException nfe => (StatusCodes.Status404NotFound, new ProblemDetails
             {

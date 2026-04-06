@@ -1,5 +1,8 @@
+using FluentValidation.Results;
 using OrderManagement.Application.Common.Caching;
 using OrderManagement.Application.Common.Interfaces;
+using DomainValidationException = System.ComponentModel.DataAnnotations.ValidationException;
+using AppValidationException = OrderManagement.Application.Common.Exceptions.ValidationException;
 
 namespace OrderManagement.Application.Orders.Commands.ProcessOrder;
 
@@ -22,7 +25,16 @@ public class ProcessOrderCommandHandler : IRequestHandler<ProcessOrderCommand>
 
         Guard.Against.NotFound(request.Id, order);
 
-        order.Process();
+        try
+        {
+            order.Process();
+        }
+        catch (DomainValidationException ex)
+        {
+            throw new AppValidationException(
+                [new ValidationFailure(nameof(order.Status), ex.Message)]
+            );
+        }
 
         await _context.SaveChangesAsync(cancellationToken);
         await _cache.RemoveByPrefixAsync(CachingKeys.OrdersListPrefix, cancellationToken);
