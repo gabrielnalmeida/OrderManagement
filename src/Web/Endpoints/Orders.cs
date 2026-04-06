@@ -74,7 +74,7 @@ public class Orders : IEndpointGroup
     }
 
     [EndpointSummary("Processar um pedido")]
-    [EndpointDescription("Processa o pedido especificado, alterando seu status para 'Processing'.")]
+    [EndpointDescription("Processa o pedido especificado, alterando seu status para 'Processado'.")]
     public static async Task<NoContent> ProcessOrder(ISender sender, int id)
     {
         await sender.Send(new ProcessOrderCommand(id));
@@ -82,7 +82,7 @@ public class Orders : IEndpointGroup
     }
 
     [EndpointSummary("Enviar um pedido")]
-    [EndpointDescription("Envia o pedido especificado, alterando seu status para 'Shipped'.")]
+    [EndpointDescription("Envia o pedido especificado, alterando seu status para 'Enviado'.")]
     public static async Task<NoContent> ShipOrder(ISender sender, int id)
     {
         await sender.Send(new ShipOrderCommand(id));
@@ -90,7 +90,7 @@ public class Orders : IEndpointGroup
     }
 
     [EndpointSummary("Cancelar um pedido")]
-    [EndpointDescription("Cancela o pedido especificado, alterando seu status para 'Cancelled'.")]
+    [EndpointDescription("Cancela o pedido especificado, alterando seu status para 'Cancelado'.")]
     public static async Task<NoContent> CancelOrder(ISender sender, int id)
     {
         await sender.Send(new CancelOrderCommand(id));
