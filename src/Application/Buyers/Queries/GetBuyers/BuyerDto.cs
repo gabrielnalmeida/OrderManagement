@@ -1,3 +1,4 @@
+using OrderManagement.Application.Orders.Models;
 using OrderManagement.Domain.Entities;
 
 namespace OrderManagement.Application.Buyers.Queries.GetBuyers;
@@ -10,7 +11,7 @@ public class BuyerDto
 
     public string Name { get; init; } = default!;
 
-    public List<Order> Orders { get; private set; } = [];
+    public List<SlimOrderDto> Orders { get; private set; } = [];
 
     private class Mapping : Profile
     {
