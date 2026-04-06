@@ -1,1 +1,155 @@
-﻿# Requests serão adicionados quando existirem endpoints reais da API.
+﻿# Ajuste `@baseUrl`, `@buyerId`, `@productId` e `@orderId` conforme seu ambiente.
+
+@baseUrl = http://localhost:5073
+@apiVersion = v1
+@buyerId = 1
+@productId = 1
+@orderId = 1
+
+### Health check
+GET {{baseUrl}}/health
+Accept: application/json
+
+### Listar compradores
+GET {{baseUrl}}/api/{{apiVersion}}/Buyers
+Accept: application/json
+
+### Criar comprador
+POST {{baseUrl}}/api/{{apiVersion}}/Buyers
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Buyer Teste HTTP"
+}
+
+### Atualizar comprador
+PUT {{baseUrl}}/api/{{apiVersion}}/Buyers/{{buyerId}}
+Content-Type: application/json
+
+{
+  "id": {{buyerId}},
+  "name": "Buyer Atualizado HTTP"
+}
+
+### Remover comprador
+DELETE {{baseUrl}}/api/{{apiVersion}}/Buyers/{{buyerId}}
+
+### Listar produtos
+GET {{baseUrl}}/api/{{apiVersion}}/Products
+Accept: application/json
+
+### Obter produto por id
+GET {{baseUrl}}/api/{{apiVersion}}/Products/{{productId}}
+Accept: application/json
+
+### Criar produto
+POST {{baseUrl}}/api/{{apiVersion}}/Products
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Produto HTTP",
+  "description": "Produto criado pelo arquivo Web.http",
+  "price": 129.90
+}
+
+### Atualizar produto
+PUT {{baseUrl}}/api/{{apiVersion}}/Products/{{productId}}
+Content-Type: application/json
+
+{
+  "id": {{productId}},
+  "name": "Produto HTTP Atualizado",
+  "description": "Descricao atualizada pelo Web.http",
+  "price": 149.90
+}
+
+### Remover produto
+DELETE {{baseUrl}}/api/{{apiVersion}}/Products/{{productId}}
+
+### Listar pedidos
+GET {{baseUrl}}/api/{{apiVersion}}/Orders
+Accept: application/json
+
+### Listar pedidos por comprador
+GET {{baseUrl}}/api/{{apiVersion}}/Orders?BuyerId={{buyerId}}
+Accept: application/json
+
+### Listar pedidos por status
+GET {{baseUrl}}/api/{{apiVersion}}/Orders?Status=Processed
+Accept: application/json
+
+### Listar pedidos por intervalo de criacao
+GET {{baseUrl}}/api/{{apiVersion}}/Orders?CreatedFrom=2026-01-01&CreatedTo=2026-12-31
+Accept: application/json
+
+### Obter pedido por id
+GET {{baseUrl}}/api/{{apiVersion}}/Orders/{{orderId}}
+Accept: application/json
+
+### Criar pedido
+POST {{baseUrl}}/api/{{apiVersion}}/Orders
+Content-Type: application/json
+Accept: application/json
+
+{
+  "buyerId": {{buyerId}},
+  "items": [
+    {
+      "productId": {{productId}},
+      "quantity": 2
+    }
+  ]
+}
+
+### Atualizar pedido
+PUT {{baseUrl}}/api/{{apiVersion}}/Orders/{{orderId}}
+Content-Type: application/json
+
+{
+  "id": {{orderId}},
+  "items": [
+    {
+      "productId": {{productId}},
+      "quantity": 3
+    }
+  ]
+}
+
+### Processar pedido
+PUT {{baseUrl}}/api/{{apiVersion}}/Orders/{{orderId}}/process
+
+### Enviar pedido
+PUT {{baseUrl}}/api/{{apiVersion}}/Orders/{{orderId}}/ship
+
+### Cancelar pedido
+PUT {{baseUrl}}/api/{{apiVersion}}/Orders/{{orderId}}/cancel
+
+### Remover pedido
+DELETE {{baseUrl}}/api/{{apiVersion}}/Orders/{{orderId}}
+
+### Exemplo de erro de validacao: pedido sem itens
+POST {{baseUrl}}/api/{{apiVersion}}/Orders
+Content-Type: application/json
+Accept: application/json
+
+{
+  "buyerId": {{buyerId}},
+  "items": []
+}
+
+### Exemplo de erro de request: id da rota diferente do payload
+PUT {{baseUrl}}/api/{{apiVersion}}/Orders/{{orderId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "id": 999999,
+  "items": [
+    {
+      "productId": {{productId}},
+      "quantity": 1
+    }
+  ]
+}
